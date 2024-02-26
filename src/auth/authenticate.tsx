@@ -19,7 +19,7 @@ export const AuthGuard: React.FC<IAuthGuardProps> = ({ children }) => {
   useEffect(() => {
     if (isSuccess && data) {
       dispatch(saveAuth(data.data));
-      navigate("/dashboard");
+      if (location.state && location.state.from) navigate(location.state.from);
     }
   }, [isSuccess, dispatch, location.state, data, navigate]);
 

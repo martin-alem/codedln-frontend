@@ -2,8 +2,8 @@ import React from "react";
 import { SignInMethod } from "./constant";
 
 export interface AuthUser {
-  firstName: string;
-  lastName: string;
+  firstname: string;
+  lastname: string;
   email: string;
   picture: string | null;
   verified: boolean;

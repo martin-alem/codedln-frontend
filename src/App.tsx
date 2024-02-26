@@ -3,6 +3,7 @@ import Home from "./pages/home/Home";
 import Dashboard from "./pages/dashboard/Dashboard";
 import { AuthGuard } from "./auth/authenticate";
 import Logout from "./pages/logout/Logout";
+import Profile from "./pages/profile/Profile";
 
 const App = () => {
   return (
@@ -17,7 +18,22 @@ const App = () => {
             </AuthGuard>
           }
         />
-        <Route path="/logout" element={<Logout />} />
+        <Route
+          path="/profile"
+          element={
+            <AuthGuard>
+              <Profile />
+            </AuthGuard>
+          }
+        />
+        <Route
+          path="/logout"
+          element={
+            <AuthGuard>
+              <Logout />
+            </AuthGuard>
+          }
+        />
       </Routes>
     </>
   );

@@ -3,13 +3,11 @@ import { MagnifyingGlassIcon } from "@heroicons/react/20/solid";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 import { Button } from "../../library/button";
 import { Dropdown, DropdownButton, DropdownItem, DropdownMenu, DropdownSeparator } from "../../library/dropdown";
-import { AvatarButton } from "../../library/avatar";
+import { Avatar, AvatarButton } from "../../library/avatar";
+import { RootState } from "../../store";
+import { useSelector } from "react-redux";
+import { getInitials } from "../../utils/helpers";
 
-const user = {
-  name: "Chelsea Hagon",
-  email: "chelsea.hagon@example.com",
-  imageUrl: "https://images.unsplash.com/photo-1550525811-e5869dd03032?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-};
 const userNavigation = [
   { name: "Your Profile", href: "#" },
   { name: "Settings", href: "#" },
@@ -21,6 +19,7 @@ function classNames(...classes: string[]) {
 }
 
 const Dashboard = () => {
+  const user = useSelector((state: RootState) => state.authUser.user);
   return (
     <>
       {/* When the mobile menu is open, add `overflow-hidden` to the `body` element to prevent double scrollbars */}
@@ -68,7 +67,7 @@ const Dashboard = () => {
                 <div className="hidden lg:flex lg:items-center lg:justify-end xl:col-span-4 lg:space-x-4">
                   <Button color="dark">Create Short Link</Button>
                   <Dropdown>
-                    <DropdownButton className="size-8" as={AvatarButton} src={user.imageUrl} aria-label="Account options" />
+                    <DropdownButton className="size-8" as={AvatarButton} src={user?.picture} aria-label="Account options" initials={user ? getInitials(user?.firstname, user?.lastname) : undefined} />
                     <DropdownMenu anchor="bottom">
                       <DropdownItem href="/profile">My profile</DropdownItem>
                       <DropdownSeparator />
@@ -83,11 +82,13 @@ const Dashboard = () => {
               <div className="border-t border-gray-200 pb-3 pt-4">
                 <div className="mx-auto flex max-w-3xl items-center px-4 sm:px-6">
                   <div className="flex-shrink-0">
-                    <img className="h-10 w-10 rounded-full" src={user.imageUrl} alt="" />
+                    <Avatar className="size-8" src={user?.picture} initials={user ? getInitials(user?.firstname, user?.lastname) : undefined} />
                   </div>
                   <div className="ml-3">
-                    <div className="text-base font-medium text-gray-800">{user.name}</div>
-                    <div className="text-sm font-medium text-gray-500">{user.email}</div>
+                    <div className="text-base font-medium text-gray-800">
+                      {user?.firstname} {user?.lastname}
+                    </div>
+                    <div className="text-sm font-medium text-gray-500">{user?.email}</div>
                   </div>
                 </div>
                 <div className="mx-auto mt-3 max-w-3xl space-y-1 px-2 sm:px-4">

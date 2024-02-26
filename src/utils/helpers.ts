@@ -10,3 +10,7 @@ export function handleServerError(error: FetchBaseQueryError | SerializedError |
   }
   return { statusCode: 500, message: ERROR_MESSAGES.GENERIC };
 }
+
+export function getInitials(firstname: string, lastname: string): string {
+  return firstname.charAt(0).toUpperCase() + lastname.charAt(0).toUpperCase();
+}
