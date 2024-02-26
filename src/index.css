@@ -14,7 +14,7 @@
   --toastify-icon-color-error: var(--toastify-color-error) !important;
 
   --toastify-toast-width: 620px !important;
-  --toastify-font-family: Short Stack !important;
+  --toastify-font-family: Inter !important;
   --toastify-z-index: 99999999 !important;
 }
 

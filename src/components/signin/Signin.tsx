@@ -30,10 +30,9 @@ const Signin = () => {
   useEffect(() => {
     if (googleIsSuccess) {
       dispatch(saveAuth(googleData.data));
-      console.log(googleData.data);
-        navigate("/");
+      navigate("/dashboard");
     }
-  }, []);
+  }, [dispatch, googleIsSuccess, navigate]);
 
   useEffect(() => {
     if (googleIsError && googleError) {

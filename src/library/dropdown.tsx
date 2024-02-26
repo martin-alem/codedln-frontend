@@ -92,10 +92,10 @@ export function DropdownItem(props: { href?: string } & HeadlessMenuItemProps<'b
         'group cursor-default rounded-lg px-3.5 py-2.5 focus:outline-none sm:px-3 sm:py-1.5',
 
         // Text styles
-        'text-left text-base/6 text-zinc-950 sm:text-sm/6 dark:text-white forced-colors:text-[CanvasText]',
+        'text-left text-base/6 text-black sm:text-sm/6 dark:text-black forced-colors:text-[CanvasText]',
 
         // Focus
-        'data-[focus]:bg-blue-500 data-[focus]:text-white',
+        'data-[focus]:bg-black data-[focus]:text-white',
 
         // Disabled state
         'data-[disabled]:opacity-50',

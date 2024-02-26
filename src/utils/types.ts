@@ -1,15 +1,18 @@
+import React from "react";
 import { SignInMethod } from "./constant";
 
 export interface AuthUser {
   firstName: string;
   lastName: string;
-  emailAddress: string;
-  authenticationMethod: string;
-  avatarUrl: string | null;
+  email: string;
+  picture: string | null;
   verified: boolean;
-  status: string;
 }
 
+export interface IServerResponse<T> {
+  data: T;
+  status_code: number;
+}
 export interface IAuth {
   user: AuthUser | null;
 }
@@ -63,6 +66,10 @@ export interface IServerError {
   method: string;
   statusCode: number;
   timeStamp: number;
+}
+
+export interface IAuthGuardProps {
+  children: React.ReactNode;
 }
 
 declare global {

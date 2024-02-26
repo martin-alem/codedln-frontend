@@ -1,11 +1,14 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import { AuthUser, IGoogleOAuthPayload, IServerResponse } from "../utils/types";
+import { AuthUser, IServerResponse } from "../utils/types";
 
 const BACKEND_API_URL = import.meta.env.VITE_APP_BACKEND_API_URL;
 const API_KEY = import.meta.env.VITE_APP_API_KEY;
 
-export const authApi = createApi({
-  reducerPath: "authApi",
+export const userApi = createApi({
+  reducerPath: "userApi",
+  refetchOnMountOrArgChange: true,
+  refetchOnFocus: true,
+  refetchOnReconnect: true,
   baseQuery: fetchBaseQuery({
     baseUrl: `${BACKEND_API_URL}/user`,
     credentials: "include",
@@ -18,15 +21,14 @@ export const authApi = createApi({
   }),
 
   endpoints: (builder) => ({
-    googleSignIn: builder.mutation<IServerResponse<AuthUser>, IGoogleOAuthPayload>({
-      query: (payload: IGoogleOAuthPayload) => ({
+    getUser: builder.query<IServerResponse<AuthUser>, void>({
+      query: () => ({
         url: "",
-        method: "POST",
-        body: payload,
+        method: "GET",
       }),
     }),
 
-    logout: builder.mutation({
+    deleteUser: builder.mutation({
       query: () => ({
         url: "/logout",
         method: "DELETE",
@@ -35,4 +37,4 @@ export const authApi = createApi({
   }),
 });
 
-export const { useGoogleSignInMutation, useLogoutMutation } = authApi;
+export const { useGetUserQuery, useDeleteUserMutation } = userApi;
