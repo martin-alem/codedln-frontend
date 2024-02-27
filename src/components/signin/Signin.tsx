@@ -41,7 +41,7 @@ const Signin = () => {
     }
   }, [googleIsError, googleError]);
   return (
-    <div className="flex flex-1 flex-col justify-center px-4 py-12 sm:px-6 lg:flex-none lg:px-20 xl:px-24">
+    <div className="flex flex-col justify-center px-4 py-12 sm:px-6 lg:flex-none lg:px-20 xl:px-24">
       <div className="mx-auto w-full max-w-sm lg:w-96">
         <div>
           <img className="h-20 w-auto" src="https://gemkox-spaces.nyc3.cdn.digitaloceanspaces.com/codedln/codedln.svg" alt="codedln" />

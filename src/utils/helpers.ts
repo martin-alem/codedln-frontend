@@ -14,3 +14,11 @@ export function handleServerError(error: FetchBaseQueryError | SerializedError |
 export function getInitials(firstname: string, lastname: string): string {
   return firstname.charAt(0).toUpperCase() + lastname.charAt(0).toUpperCase();
 }
+
+export async function writeClipboardText(text: string, callback: () => void) {
+  try {
+    await navigator.clipboard.writeText(text);
+  } finally {
+    callback();
+  }
+}

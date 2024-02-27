@@ -1,7 +1,8 @@
 import React from "react";
-import { SignInMethod } from "./constant";
+import { SignInMethod, UserType } from "./constant";
 
 export interface AuthUser {
+  _id: string;
   firstname: string;
   lastname: string;
   email: string;
@@ -58,6 +59,30 @@ export interface IGoogleOAuthProps {
 export interface IGoogleOAuthPayload {
   idToken: string;
   signInWith: SignInMethod;
+}
+
+export interface ICreateShortUrlPayload {
+  payload: {
+    originalUrl: string;
+    alias: string;
+  };
+  endpoint: string;
+}
+
+export interface IShortLinkProps {
+  userType: UserType;
+}
+
+export interface IDisplayShortUrlProps {
+  url: string;
+  callback: () => void;
+}
+
+export interface IUrl {
+  _id: string;
+  originalUrl: string;
+  alias: string;
+  createdAt: string;
 }
 
 export interface IServerError {

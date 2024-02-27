@@ -6,3 +6,8 @@ export enum SignInMethod {
   GOOGLE = "google",
   GITHUB = "github",
 }
+
+export enum UserType {
+  GUEST = "guest",
+  AUTH_USER = "auth_user",
+}
