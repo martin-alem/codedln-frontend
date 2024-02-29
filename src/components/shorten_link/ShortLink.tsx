@@ -4,14 +4,13 @@ import { ErrorMessage, Field, FieldGroup, Fieldset, Label } from "../../library/
 import { Text } from "../../library/text";
 import { Input } from "../../library/input";
 import { validateAlias, validateUrl } from "../../utils/input_validation";
-import { ICreateShortUrlPayload, IShortLinkProps, IUrl } from "../../utils/types";
+import { ICreateShortUrlPayload, IUrl } from "../../utils/types";
 import { useCreateUrlMutation } from "../../api/url.api";
-import { UserType } from "../../utils/constant";
 import { toast } from "react-toastify";
 import { handleServerError } from "../../utils/helpers";
 import DisplayShortUrl from "../display_short_url/DisplayShortUrl";
 
-const ShortLink: React.FC<IShortLinkProps> = ({ userType }) => {
+const ShortLink = () => {
   const [shortenUrl, setShortenUrl] = useState<IUrl | null>(null);
   const [longUrl, setLongUrl] = useState<string>("");
   const [validLongUrl, setValidLongUrl] = useState<boolean>(false);
@@ -33,7 +32,7 @@ const ShortLink: React.FC<IShortLinkProps> = ({ userType }) => {
     setValidAlias(alias ? !result : false);
   }, [alias]);
 
-  const [createUrl, { isSuccess, isError, error, data }] = useCreateUrlMutation();
+  const [createUrl, { isLoading, isSuccess, isError, error, data }] = useCreateUrlMutation();
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -46,7 +45,7 @@ const ShortLink: React.FC<IShortLinkProps> = ({ userType }) => {
         originalUrl: longUrl,
         alias: alias,
       },
-      endpoint: userType === UserType.GUEST ? "/guest" : "",
+      endpoint: "/guest",
     };
 
     createUrl(payload);
@@ -93,7 +92,7 @@ const ShortLink: React.FC<IShortLinkProps> = ({ userType }) => {
                   </Field>
                   {shortenUrl && <DisplayShortUrl url={`https://codedln.com/${shortenUrl.alias}`} callback={() => setShortenUrl(null)} />}
                   <Field>
-                    <Button type="submit" color="dark" className="w-full" disabled={validLongUrl || validAlias}>
+                    <Button type="submit" color="dark" className="w-full" disabled={validLongUrl || validAlias || isLoading}>
                       Shorten URL
                     </Button>
                   </Field>

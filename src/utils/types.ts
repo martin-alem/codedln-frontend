@@ -1,5 +1,5 @@
 import React from "react";
-import { SignInMethod, UserType } from "./constant";
+import { SignInMethod } from "./constant";
 
 export interface AuthUser {
   _id: string;
@@ -69,8 +69,9 @@ export interface ICreateShortUrlPayload {
   endpoint: string;
 }
 
-export interface IShortLinkProps {
-  userType: UserType;
+export interface ICreateLinkDialogProps {
+  open: boolean;
+  onClose: (value: boolean) => void;
 }
 
 export interface IDisplayShortUrlProps {

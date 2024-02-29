@@ -4,36 +4,45 @@ import Dashboard from "./pages/dashboard/Dashboard";
 import { AuthGuard } from "./auth/authenticate";
 import Logout from "./pages/logout/Logout";
 import Profile from "./pages/profile/Profile";
+import Index from "./pages/index/Index";
 
 const App = () => {
   return (
     <>
       <Routes>
-        <Route path="/" element={<Home />} />
+        <Route path="/" element={<Index />} />
         <Route
           path="/dashboard"
           element={
             <AuthGuard>
-              <Dashboard />
+              <Home />
             </AuthGuard>
-          }
-        />
-        <Route
-          path="/profile"
-          element={
-            <AuthGuard>
-              <Profile />
-            </AuthGuard>
-          }
-        />
-        <Route
-          path="/logout"
-          element={
-            <AuthGuard>
-              <Logout />
-            </AuthGuard>
-          }
-        />
+          }>
+          <Route
+            index
+            element={
+              <AuthGuard>
+                <Dashboard />
+              </AuthGuard>
+            }
+          />
+          <Route
+            path="profile"
+            element={
+              <AuthGuard>
+                <Profile />
+              </AuthGuard>
+            }
+          />
+          <Route
+            path="logout"
+            element={
+              <AuthGuard>
+                <Logout />
+              </AuthGuard>
+            }
+          />
+        </Route>
       </Routes>
     </>
   );
