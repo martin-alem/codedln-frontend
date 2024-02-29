@@ -72,6 +72,7 @@ export interface ICreateShortUrlPayload {
 export interface ICreateLinkDialogProps {
   open: boolean;
   onClose: (value: boolean) => void;
+  onCreateLink: () => void;
 }
 
 export interface IDisplayShortUrlProps {
@@ -84,6 +85,26 @@ export interface IUrl {
   originalUrl: string;
   alias: string;
   createdAt: string;
+}
+
+export interface ILinkProps {
+  link: IUrl;
+}
+
+export interface INavProps {
+  setQuery: (value: string) => void;
+  onCreateLink: () => void;
+}
+
+export interface IPaginatedUrl {
+  data: IUrl[];
+  total: number;
+}
+
+export interface IGetUrlPayload {
+  query: string;
+  limit: number;
+  sort: number;
 }
 
 export interface IServerError {

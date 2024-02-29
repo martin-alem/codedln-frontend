@@ -10,6 +10,8 @@ import { getInitials } from "../../utils/helpers";
 import { useState } from "react";
 import CreateLinkDiaLog from "../create_link_dialog/CreateLinkDiaLog";
 import { Link } from "../../library/link";
+import { INavProps } from "../../utils/types";
+import { debounce } from "lodash";
 
 const userNavigation = [
   { name: "Your Profile", href: "profile" },
@@ -20,7 +22,7 @@ function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(" ");
 }
 
-const Nav = () => {
+const Nav: React.FC<INavProps> = ({ setQuery, onCreateLink }) => {
   const [isOpen, setIsOpen] = useState(false);
   const user = useSelector((state: RootState) => state.authUser.user);
   return (
@@ -49,6 +51,7 @@ const Nav = () => {
                           <MagnifyingGlassIcon className="h-5 w-5 text-gray-400" aria-hidden="true" />
                         </div>
                         <input
+                          onChange={debounce((e: React.ChangeEvent<HTMLInputElement>) => setQuery(e.target.value), 500)}
                           id="search"
                           name="search"
                           className="block w-full rounded-md border-0 bg-white py-1.5 pl-10 pr-3 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-500 sm:text-sm sm:leading-6"
@@ -74,9 +77,9 @@ const Nav = () => {
                   <Dropdown>
                     <DropdownButton className="size-8" as={AvatarButton} src={user?.picture} aria-label="Account options" initials={user ? getInitials(user?.firstname, user?.lastname) : undefined} />
                     <DropdownMenu anchor="bottom">
-                      <DropdownItem href="profile">My profile</DropdownItem>
+                      <DropdownItem href="/profile">My profile</DropdownItem>
                       <DropdownSeparator />
-                      <DropdownItem href="logout">Sign out</DropdownItem>
+                      <DropdownItem href="/logout">Sign out</DropdownItem>
                     </DropdownMenu>
                   </Dropdown>
                 </div>
@@ -109,7 +112,7 @@ const Nav = () => {
         )}
       </Popover>
 
-      <CreateLinkDiaLog open={isOpen} onClose={setIsOpen} />
+      <CreateLinkDiaLog open={isOpen} onClose={() => setIsOpen(false)} onCreateLink={onCreateLink} />
     </>
   );
 };

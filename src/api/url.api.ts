@@ -1,5 +1,5 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import { ICreateShortUrlPayload, IServerResponse, IUrl } from "../utils/types";
+import { ICreateShortUrlPayload, IGetUrlPayload, IPaginatedUrl, IServerResponse, IUrl } from "../utils/types";
 
 const BACKEND_API_URL = import.meta.env.VITE_APP_BACKEND_API_URL;
 const API_KEY = import.meta.env.VITE_APP_API_KEY;
@@ -28,7 +28,21 @@ export const urlApi = createApi({
         body: payload.payload,
       }),
     }),
+
+    GetUrl: builder.query<IServerResponse<IPaginatedUrl>, IGetUrlPayload>({
+      query: (payload: IGetUrlPayload) => ({
+        url: `/get_urls?query=${payload.query}&date_sort=${payload.sort}&limit=${payload.limit}`,
+        method: "GET",
+      }),
+    }),
+
+    DeleteUrl: builder.mutation<IServerResponse<void>, string>({
+      query: (payload: string) => ({
+        url: `/delete_url/${payload}`,
+        method: "DELETE",
+      }),
+    }),
   }),
 });
 
-export const { useCreateUrlMutation } = urlApi;
+export const { useCreateUrlMutation, useGetUrlQuery, useDeleteUrlMutation } = urlApi;

@@ -11,7 +11,7 @@ import { validateUrl, validateAlias } from "../../utils/input_validation";
 import DisplayShortUrl from "../display_short_url/DisplayShortUrl";
 import { LinkIcon } from "@heroicons/react/24/outline";
 
-const CreateLinkDiaLog: React.FC<ICreateLinkDialogProps> = ({ open, onClose }) => {
+const CreateLinkDiaLog: React.FC<ICreateLinkDialogProps> = ({ open, onClose, onCreateLink }) => {
   const [shortenUrl, setShortenUrl] = useState<IUrl | null>(null);
   const [longUrl, setLongUrl] = useState<string>("");
   const [validLongUrl, setValidLongUrl] = useState<boolean>(false);
@@ -54,11 +54,13 @@ const CreateLinkDiaLog: React.FC<ICreateLinkDialogProps> = ({ open, onClose }) =
   useEffect(() => {
     if (isSuccess) {
       setShortenUrl(data.data);
+      onCreateLink();
       setLongUrl("");
       setAlias("");
       setValidAlias(false);
       setValidLongUrl(false);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data, isSuccess]);
 
   useEffect(() => {
