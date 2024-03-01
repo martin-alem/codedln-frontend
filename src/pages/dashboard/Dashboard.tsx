@@ -1,11 +1,12 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useState } from "react";
-import { IUrl } from "../../utils/types";
-import { useDeleteUrlMutation, useGetUrlQuery } from "../../api/url.api";
+import { IPaginatedUrl } from "../../utils/types";
+import { useDeleteAllUrlMutation, useDeleteUrlMutation, useGetUrlQuery } from "../../api/url.api";
 import { toast } from "react-toastify";
 import { handleServerError } from "../../utils/helpers";
 import Shimmer from "../../components/shimmer/Shimmer";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../../library/table";
-import { Pagination, PaginationPrevious, PaginationList, PaginationPage, PaginationGap, PaginationNext } from "../../library/pagination";
+import { Pagination, PaginationPrevious, PaginationList, PaginationPage, PaginationNext, PaginationGap } from "../../library/pagination";
 import { format } from "date-fns";
 import { Link } from "../../library/link";
 import Nav from "../../components/nav/Nav";
@@ -13,20 +14,33 @@ import { Dropdown, DropdownButton, DropdownItem, DropdownLabel, DropdownMenu } f
 import { ChevronDownIcon, TrashIcon } from "@heroicons/react/24/outline";
 import { Alert, AlertTitle, AlertDescription, AlertActions } from "../../library/alert";
 import { Button } from "../../library/button";
+import { useLocation } from "react-router-dom";
 import EmptyState from "../../components/empty_state/EmptyState";
+import { Checkbox, CheckboxField } from "../../library/checkbox";
+import { Label } from "../../library/fieldset";
 
 const Dashboard = () => {
+  const location = useLocation();
   const [isOpen, setIsOpen] = useState(false);
   const [currentLink, setCurrentLink] = useState<string>("");
-  const [links, setLinks] = useState<IUrl[] | null>(null);
+  const [links, setLinks] = useState<IPaginatedUrl | null>(null);
   const [query, setQuery] = useState<string>("");
+  const [linksToDelete, setLinksToDelete] = useState<string[]>([]);
   const [sort, setSort] = useState<number>(-1);
-  const { data, error, isError, isSuccess, isLoading, isFetching, refetch } = useGetUrlQuery({ limit: 10, query: query, sort: sort });
-  const [deleteUrl, { isLoading: deleteUrlLoading, isSuccess: deleteUrlSuccess, isError: deleteUrlIsError, error: deleteUrlError }] = useDeleteUrlMutation();
+  const [skip, setSkip] = useState<number>(0);
 
+  const [totalPages, setTotalPages] = useState<number>(0);
+  const [minPage, setMinPage] = useState<number>(1);
+  const [maxPage, setMaxPage] = useState<number>(5);
+  const [currentPage, setCurrentPage] = useState<number>(0);
+
+  const { data, error, isError, isSuccess, isLoading, isFetching, refetch } = useGetUrlQuery({ limit: 10, skip: skip, query: query, sort: sort });
+  const [deleteUrl, { isLoading: deleteUrlLoading, isSuccess: deleteUrlSuccess, isError: deleteUrlIsError, error: deleteUrlError }] = useDeleteUrlMutation();
+  const [deleteAllUrl, { isLoading: deleteAllUrlLoading, isSuccess: deleteAllUrlSuccess, isError: deleteAllUrlIsError, error: deleteAllUrlError }] = useDeleteAllUrlMutation();
   useEffect(() => {
     if (isSuccess) {
-      setLinks(data.data.data);
+      setLinks(data.data);
+      setTotalPages(Math.ceil(data.data.total / 10) - 1);
     }
   }, [isSuccess, data]);
 
@@ -53,22 +67,98 @@ const Dashboard = () => {
     }
   }, [deleteUrlIsError, deleteUrlError]);
 
+  useEffect(() => {
+    if (deleteAllUrlSuccess) {
+      setLinksToDelete([]);
+      toast.success("Links were successfully deleted", { position: "top-right" });
+      refetch();
+    }
+  }, [deleteAllUrlSuccess, refetch]);
+
+  useEffect(() => {
+    if (deleteAllUrlIsError && deleteAllUrlError) {
+      const { message } = handleServerError(deleteAllUrlError);
+      toast.error(message, { position: "top-center" });
+    }
+  }, [deleteAllUrlIsError, deleteAllUrlError]);
+
   const handleDeleteUrl = (url: string) => {
     setIsOpen(true);
     setCurrentLink(url);
   };
 
+  const handleDeleteAllUrl = () => {
+    const payload = linksToDelete.join(",");
+    deleteAllUrl(payload);
+  };
+
   const handleCreateUrl = () => {
     refetch();
   };
+
+  const handleQueryParamChange = () => {
+    const queryParams = new URLSearchParams(location.search);
+    const page = queryParams.get("page");
+    const next = queryParams.get("next");
+    const previous = queryParams.get("previous");
+
+    if (page !== null) {
+      setSkip(parseInt(page, 10));
+      setCurrentPage(parseInt(page, 10));
+    }
+    if (next !== null) {
+      console.log("NEXT");
+      handleNextPage();
+    }
+    if (previous !== null) {
+      handlePrevPage();
+    }
+  };
+
+  useEffect(() => {
+    handleQueryParamChange();
+  }, [location.search]);
+
+  const handleNextPage = () => {
+    const value = currentPage + 1;
+    if (value > maxPage && value < totalPages) {
+      setMinPage((prev) => prev + 1);
+      setMaxPage((next) => next + 1);
+      setCurrentPage(value);
+    }
+  };
+
+  const handlePrevPage = () => {
+    const value = currentPage - 1;
+    if (value < minPage && value < 1) {
+      setMinPage((prev) => prev - 1);
+      setMaxPage((next) => next - 1);
+      setCurrentPage(value);
+    }
+  };
   return (
     <>
-      <Nav setQuery={setQuery} onCreateLink={handleCreateUrl}/>
-      {!links || links.length === 0 ? (
-        <EmptyState />
-      ) : (
+      <Nav setQuery={setQuery} onCreateLink={handleCreateUrl} />
+      {links?.data && links.data.length > 0 ? (
         <div className="mx-auto mt-10 max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="w-full flex items-center justify-between">
+            <div className="w-full flex items-center gap-4">
+              <CheckboxField>
+                <Checkbox
+                  name="allow_embedding"
+                  checked={linksToDelete.length > 0}
+                  indeterminate={linksToDelete.length !== links.data.length}
+                  onChange={(checked) => setLinksToDelete(checked ? links.data.map((link) => link._id) : [])}
+                />
+                <Label>Select all</Label>
+              </CheckboxField>
+              {linksToDelete.length > 0 && (
+                <Button disabled={deleteAllUrlLoading} onClick={handleDeleteAllUrl} type="button" plain className="cursor-pointer">
+                  <TrashIcon className="w-4" />
+                  Delete
+                </Button>
+              )}
+            </div>
             <Dropdown>
               <DropdownButton outline>
                 Sort
@@ -84,15 +174,16 @@ const Dashboard = () => {
               </DropdownMenu>
             </Dropdown>
           </div>
-          <div className="mx-auto max-w-7xl">
+          <div className="mx-auto mt-4 max-w-7xl">
             {isLoading || isFetching ? (
               <Shimmer />
             ) : (
               links && (
                 <>
-                  <Table>
+                  <Table bleed className="[--gutter:theme(spacing.6)] sm:[--gutter:theme(spacing.8)]">
                     <TableHead>
                       <TableRow>
+                        <TableHeader></TableHeader>
                         <TableHeader>Original Url</TableHeader>
                         <TableHeader>Short Url</TableHeader>
                         <TableHeader>Date</TableHeader>
@@ -100,9 +191,23 @@ const Dashboard = () => {
                       </TableRow>
                     </TableHead>
                     <TableBody>
-                      {links.map((link) => (
+                      {links.data.map((link) => (
                         <TableRow key={link._id}>
-                          <TableCell className="font-medium">{link.originalUrl}</TableCell>
+                          <TableCell>
+                            <Checkbox
+                              aria-label="Allow embedding"
+                              name="allow_embedding"
+                              checked={linksToDelete.includes(link._id)}
+                              onChange={(checked) => {
+                                return setLinksToDelete((pending) => {
+                                  return checked ? [...pending, link._id] : pending.filter((item) => item !== link._id);
+                                });
+                              }}
+                            />
+                          </TableCell>
+                          <TableCell className="font-medium">
+                            <div className="w-96 truncate">{link.originalUrl}</div>
+                          </TableCell>
                           <TableCell>
                             <Link className="text-green-500 underline" href={`https://codedln.com/${link.alias}`}>{`https://codedln.com/${link.alias}`}</Link>
                           </TableCell>
@@ -115,25 +220,25 @@ const Dashboard = () => {
                     </TableBody>
                   </Table>
                   <Pagination className="mt-6">
-                    <PaginationPrevious href="?page=2" />
+                    {currentPage > 1 ? <PaginationPrevious href={`?next=${currentPage - 1}`} /> : <PaginationPrevious />}
                     <PaginationList>
-                      <PaginationPage href="?page=1">1</PaginationPage>
-                      <PaginationPage href="?page=2">2</PaginationPage>
-                      <PaginationPage href="?page=3" current>
-                        3
-                      </PaginationPage>
-                      <PaginationPage href="?page=4">4</PaginationPage>
+                      {Array.from({ length: maxPage }, (_, index) => (
+                        <PaginationPage current={currentPage == index} key={index} href={`?page=${index}`}>
+                          {`${index + minPage}`}
+                        </PaginationPage>
+                      ))}
                       <PaginationGap />
-                      <PaginationPage href="?page=65">65</PaginationPage>
-                      <PaginationPage href="?page=66">66</PaginationPage>
+                      <PaginationPage href={`?page=${totalPages}`}>{`${totalPages}`}</PaginationPage>
                     </PaginationList>
-                    <PaginationNext href="?page=4" />
+                    {currentPage < totalPages ? <PaginationNext href={`?next=${currentPage + 1}`} /> : <PaginationNext />}
                   </Pagination>
                 </>
               )
             )}
           </div>
         </div>
+      ) : (
+        <EmptyState />
       )}
 
       <Alert open={isOpen} onClose={setIsOpen}>

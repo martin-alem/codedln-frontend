@@ -7,7 +7,7 @@ const API_KEY = import.meta.env.VITE_APP_API_KEY;
 export const urlApi = createApi({
   reducerPath: "urlApi",
   refetchOnMountOrArgChange: true,
-  refetchOnFocus: true,
+  refetchOnFocus: false,
   refetchOnReconnect: true,
   baseQuery: fetchBaseQuery({
     baseUrl: `${BACKEND_API_URL}/url`,
@@ -31,7 +31,14 @@ export const urlApi = createApi({
 
     GetUrl: builder.query<IServerResponse<IPaginatedUrl>, IGetUrlPayload>({
       query: (payload: IGetUrlPayload) => ({
-        url: `/get_urls?query=${payload.query}&date_sort=${payload.sort}&limit=${payload.limit}`,
+        url: `/get_urls?query=${payload.query}&date_sort=${payload.sort}&limit=${payload.limit}&skip=${payload.skip}`,
+        method: "GET",
+      }),
+    }),
+
+    Redirect: builder.query<IServerResponse<string>, string>({
+      query: (payload: string) => ({
+        url: `/redirect?alias=${payload}`,
         method: "GET",
       }),
     }),
@@ -42,7 +49,14 @@ export const urlApi = createApi({
         method: "DELETE",
       }),
     }),
+
+    DeleteAllUrl: builder.mutation<IServerResponse<void>, string>({
+      query: (payload: string) => ({
+        url: `/delete_urls?url=${payload}`,
+        method: "DELETE",
+      }),
+    }),
   }),
 });
 
-export const { useCreateUrlMutation, useGetUrlQuery, useDeleteUrlMutation } = urlApi;
+export const { useCreateUrlMutation, useGetUrlQuery, useDeleteUrlMutation, useDeleteAllUrlMutation, useRedirectQuery } = urlApi;

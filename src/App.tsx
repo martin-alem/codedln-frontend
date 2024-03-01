@@ -4,6 +4,7 @@ import { AuthGuard } from "./auth/authenticate";
 import Logout from "./pages/logout/Logout";
 import Profile from "./pages/profile/Profile";
 import Index from "./pages/index/Index";
+import Redirect from "./pages/redirect/Redirect";
 
 const App = () => {
   return (
@@ -31,6 +32,14 @@ const App = () => {
           element={
             <AuthGuard>
               <Logout />
+            </AuthGuard>
+          }
+        />
+        <Route
+          path="/:alias"
+          element={
+            <AuthGuard>
+              <Redirect />
             </AuthGuard>
           }
         />

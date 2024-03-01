@@ -87,9 +87,7 @@ export interface IUrl {
   createdAt: string;
 }
 
-export interface ILinkProps {
-  link: IUrl;
-}
+
 
 export interface INavProps {
   setQuery: (value: string) => void;
@@ -104,6 +102,7 @@ export interface IPaginatedUrl {
 export interface IGetUrlPayload {
   query: string;
   limit: number;
+  skip: number;
   sort: number;
 }
 
