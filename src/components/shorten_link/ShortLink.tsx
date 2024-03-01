@@ -53,11 +53,13 @@ const ShortLink = () => {
 
   useEffect(() => {
     if (isSuccess) {
-      setShortenUrl(data.data);
-      setLongUrl("");
-      setAlias("");
-      setValidAlias(false);
-      setValidLongUrl(false);
+      if (data) {
+        setShortenUrl(data.data);
+        setLongUrl("");
+        setAlias("");
+        setValidAlias(false);
+        setValidLongUrl(false);
+      }
     }
   }, [data, isSuccess]);
 

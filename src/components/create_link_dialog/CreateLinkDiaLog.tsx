@@ -53,12 +53,14 @@ const CreateLinkDiaLog: React.FC<ICreateLinkDialogProps> = ({ open, onClose, onC
 
   useEffect(() => {
     if (isSuccess) {
-      setShortenUrl(data.data);
-      onCreateLink();
-      setLongUrl("");
-      setAlias("");
-      setValidAlias(false);
-      setValidLongUrl(false);
+      if (data) {
+        setShortenUrl(data.data);
+        onCreateLink();
+        setLongUrl("");
+        setAlias("");
+        setValidAlias(false);
+        setValidLongUrl(false);
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data, isSuccess]);

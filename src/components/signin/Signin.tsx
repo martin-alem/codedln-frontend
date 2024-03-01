@@ -29,8 +29,10 @@ const Signin = () => {
 
   useEffect(() => {
     if (googleIsSuccess) {
-      dispatch(saveAuth(googleData.data));
-      navigate("/dashboard");
+      if (googleData) {
+        dispatch(saveAuth(googleData.data));
+        navigate("/dashboard");
+      }
     }
   }, [dispatch, googleIsSuccess, navigate]);
 
