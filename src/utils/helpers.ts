@@ -5,10 +5,11 @@ import { IServerError } from "./types";
 
 export function handleServerError(error: FetchBaseQueryError | SerializedError | undefined) {
   if (error && "data" in error) {
+
     const serverError = error["data"] as IServerError;
     if (serverError.statusCode !== 500) return { statusCode: serverError.statusCode, message: serverError.message };
   }
-  return { statusCode: 500, message: ERROR_MESSAGES.GENERIC };
+  return { status: 500, message: ERROR_MESSAGES.GENERIC };
 }
 
 export function getInitials(firstname: string, lastname: string): string {
