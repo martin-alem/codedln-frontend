@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { IPaginatedUrl } from "../../utils/types";
 import { useDeleteAllUrlMutation, useDeleteUrlMutation, useGetUrlQuery } from "../../api/url.api";
 import { toast } from "react-toastify";
-import { handleServerError } from "../../utils/helpers";
+import { generateArrayInRange, handleServerError } from "../../utils/helpers";
 import Shimmer from "../../components/shimmer/Shimmer";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../../library/table";
 import { Pagination, PaginationPrevious, PaginationList, PaginationPage, PaginationNext, PaginationGap } from "../../library/pagination";
@@ -34,13 +34,19 @@ const Dashboard = () => {
   const [maxPage, setMaxPage] = useState<number>(5);
   const [currentPage, setCurrentPage] = useState<number>(0);
 
-  const { data, error, isError, isSuccess, isLoading, isFetching, refetch } = useGetUrlQuery({ limit: 10, skip: skip, query: query, sort: sort });
+  const { data, error, isError, isSuccess, isLoading, isFetching, refetch } = useGetUrlQuery({
+    limit: 10,
+    skip: skip,
+    query: query,
+    sort: sort,
+  });
   const [deleteUrl, { isLoading: deleteUrlLoading, isSuccess: deleteUrlSuccess, isError: deleteUrlIsError, error: deleteUrlError }] = useDeleteUrlMutation();
   const [deleteAllUrl, { isLoading: deleteAllUrlLoading, isSuccess: deleteAllUrlSuccess, isError: deleteAllUrlIsError, error: deleteAllUrlError }] = useDeleteAllUrlMutation();
   useEffect(() => {
     if (isSuccess) {
       setLinks(data.data);
-      setTotalPages(Math.ceil(data.data.total / 10) - 1);
+      const totalPages = Math.ceil(data.data.total / 10) - 1;
+      setTotalPages(totalPages);
     }
   }, [isSuccess, data]);
 
@@ -100,18 +106,19 @@ const Dashboard = () => {
     const queryParams = new URLSearchParams(location.search);
     const page = queryParams.get("page");
     const next = queryParams.get("next");
-    const previous = queryParams.get("previous");
+    const previous = queryParams.get("prev");
 
     if (page !== null) {
-      setSkip(parseInt(page, 10));
-      setCurrentPage(parseInt(page, 10));
+      const pageInt = parseInt(page, 10);
+      handlePage(pageInt);
     }
     if (next !== null) {
-      console.log("NEXT");
-      handleNextPage();
+      const nextInt = parseInt(next, 10);
+      handleNextPage(nextInt);
     }
     if (previous !== null) {
-      handlePrevPage();
+      const previousInt = parseInt(previous, 10);
+      handlePrevPage(previousInt);
     }
   };
 
@@ -119,22 +126,29 @@ const Dashboard = () => {
     handleQueryParamChange();
   }, [location.search]);
 
-  const handleNextPage = () => {
-    const value = currentPage + 1;
-    if (value > maxPage && value < totalPages) {
+  const handleNextPage = (next: number) => {
+    setSkip(next);
+    setCurrentPage(next);
+    if (next == maxPage) {
       setMinPage((prev) => prev + 1);
       setMaxPage((next) => next + 1);
-      setCurrentPage(value);
+      setCurrentPage(next);
     }
   };
 
-  const handlePrevPage = () => {
-    const value = currentPage - 1;
-    if (value < minPage && value < 1) {
+  const handlePrevPage = (previous: number) => {
+    setSkip(previous);
+    setCurrentPage(previous);
+    if (previous > 0 && previous == minPage - 1) {
       setMinPage((prev) => prev - 1);
       setMaxPage((next) => next - 1);
-      setCurrentPage(value);
+      setCurrentPage(previous);
     }
+  };
+
+  const handlePage = (page: number) => {
+    setSkip(page);
+    setCurrentPage(page);
   };
   return (
     <>
@@ -219,19 +233,25 @@ const Dashboard = () => {
                       ))}
                     </TableBody>
                   </Table>
-                  <Pagination className="mt-6">
-                    {currentPage > 1 ? <PaginationPrevious href={`?next=${currentPage - 1}`} /> : <PaginationPrevious />}
-                    <PaginationList>
-                      {Array.from({ length: maxPage }, (_, index) => (
-                        <PaginationPage current={currentPage == index} key={index} href={`?page=${index}`}>
-                          {`${index + minPage}`}
-                        </PaginationPage>
-                      ))}
-                      <PaginationGap />
-                      <PaginationPage href={`?page=${totalPages}`}>{`${totalPages}`}</PaginationPage>
-                    </PaginationList>
-                    {currentPage < totalPages ? <PaginationNext href={`?next=${currentPage + 1}`} /> : <PaginationNext />}
-                  </Pagination>
+                  {totalPages > 0 && (
+                    <Pagination className="mt-6">
+                      {currentPage > 0 ? <PaginationPrevious href={`?prev=${currentPage - 1}`} /> : <PaginationPrevious />}
+                      <PaginationList>
+                        {generateArrayInRange(minPage, maxPage).map((index) => (
+                          <PaginationPage current={currentPage == index - 1} key={index} href={`?page=${index - 1}`}>
+                            {`${index}`}
+                          </PaginationPage>
+                        ))}
+                        {maxPage < totalPages ? (
+                          <>
+                            <PaginationGap />
+                            <PaginationPage current={currentPage == totalPages - 1} href={`?page=${totalPages - 1}`}>{`${totalPages}`}</PaginationPage>
+                          </>
+                        ) : null}
+                      </PaginationList>
+                      {currentPage + 1 < totalPages ? <PaginationNext href={`?next=${currentPage + 1}`} /> : <PaginationNext />}
+                    </Pagination>
+                  )}
                 </>
               )
             )}

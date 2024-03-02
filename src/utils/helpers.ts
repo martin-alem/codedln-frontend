@@ -5,7 +5,6 @@ import { IServerError } from "./types";
 
 export function handleServerError(error: FetchBaseQueryError | SerializedError | undefined) {
   if (error && "data" in error) {
-
     const serverError = error["data"] as IServerError;
     if (serverError.statusCode !== 500) return { statusCode: serverError.statusCode, message: serverError.message };
   }
@@ -22,4 +21,12 @@ export async function writeClipboardText(text: string, callback: () => void) {
   } finally {
     callback();
   }
+}
+
+export function generateArrayInRange(start: number, end: number): number[] {
+  const array = [];
+  for (let i = start; i <= end; i++) {
+    array.push(i);
+  }
+  return array;
 }

@@ -15,8 +15,8 @@ export default function NotFound(): JSX.Element {
                     </p>
                     <div className="mt-10 flex items-center justify-center gap-x-6">
                         <Link
-                            to="/"
-                            className="rounded-md bg-tk-primary px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-tk-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-tk-primary"
+                            to="dasboard"
+                            className="rounded-md bg-tk-primary px-3.5 py-2.5 text-sm font-semibold text-black shadow-sm hover:bg-tk-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-tk-primary"
                         >
                             Go back home
                         </Link>
